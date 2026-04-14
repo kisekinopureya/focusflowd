@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  commitlint:
+    name: Commit Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          configFile: .github/commitlint.config.mjs
+      - uses: wagoid/commitlint-github-action@v6
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            qt6-base-dev \
+            nlohmann-json3-dev
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DSYSTEMD=OFF
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Prepare release binary
+        run: cp build/focusflowd focusflowd-linux-x86_64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: focusflowd-binary
+          path: focusflowd-linux-x86_64
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [commitlint, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: focusflowd-binary
+          path: .
+
+      - name: Mark binary executable
+        run: chmod +x focusflowd-linux-x86_64
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: focusflowd-linux-x86_64
+          generate_release_notes: true

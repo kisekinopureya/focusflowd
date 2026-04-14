@@ -1,0 +1,39 @@
+{
+  "actions": [
+    {
+      "name": "IDE",
+      "startActions": [
+        "notify-send 'IDE window focused'",
+        "ddcutil setvcp 10 100"
+      ],
+      "endActions": [
+        "notify-send 'IDE window lost focus'",
+        "ddcutil setvcp 10 50"
+      ]
+    },
+    {
+      "name": "Gaming",
+      "startActions": [
+        "notify-send 'Game window focused'",
+        "ddcutil setvcp 10 100",
+        "ddcutil setvcp 12 75"
+      ],
+      "endActions": [
+        "notify-send 'Game window lost focus'",
+        "ddcutil setvcp 10 50",
+        "ddcutil setvcp 12 50"
+      ]
+    },
+    {
+      "name": "Media",
+      "startActions": [
+        "notify-send 'Media application focused'",
+        "playerctl play"
+      ],
+      "endActions": [
+        "notify-send 'Media application lost focus'"
+        "playerctl pause"
+      ]
+    }
+  ]
+}
