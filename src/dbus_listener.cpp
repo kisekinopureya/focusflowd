@@ -2,28 +2,28 @@
 #include <iostream>
 #include <QDBusConnection>
 #include <QDBusError>
+#include <utility>
 
 DBusListener::DBusListener(std::shared_ptr<ActionManager> actionManager)
-    : actionManager(actionManager), running(false) {}
+    : actionManager(std::move(actionManager)), running(false) {}
 
 DBusListener::~DBusListener() {
     stop();
 }
 
-bool DBusListener::initialize(const std::string& configPath) {
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    if (!bus.isConnected()) {
-        std::cerr << "Failed to connect to session D-Bus" << std::endl;
+bool DBusListener::initialize(const std::string& configPath) const {
+    if (QDBusConnection bus = QDBusConnection::sessionBus(); !bus.isConnected()) {
+        std::cerr << "Failed to connect to session D-Bus" << '\n';
         return false;
     }
 
     // Load actions from config
     if (!actionManager->loadActions(configPath)) {
-        std::cerr << "Failed to load action configuration" << std::endl;
+        std::cerr << "Failed to load action configuration" << '\n';
         return false;
     }
 
-    std::cout << "D-Bus listener initialized successfully" << std::endl;
+    std::cout << "D-Bus listener initialized successfully" << '\n';
     return true;
 }
 
@@ -32,7 +32,7 @@ bool DBusListener::start() {
 
     if (!bus.registerService("com.kisekinopureya.FocusFlow")) {
         std::cerr << "Failed to own D-Bus name: "
-                  << bus.lastError().message().toStdString() << std::endl;
+                  << bus.lastError().message().toStdString() << '\n';
         return false;
     }
 
@@ -41,7 +41,7 @@ bool DBusListener::start() {
             this,
             QDBusConnection::ExportAllSlots | QDBusConnection::ExportAllSignals)) {
         std::cerr << "Failed to register D-Bus object: "
-                  << bus.lastError().message().toStdString() << std::endl;
+                  << bus.lastError().message().toStdString() << '\n';
         bus.unregisterService("com.kisekinopureya.FocusFlow");
         return false;
     }
@@ -56,7 +56,7 @@ bool DBusListener::start() {
 
     running = true;
 
-    std::cout << "D-Bus service started" << std::endl;
+    std::cout << "D-Bus service started" << '\n';
     return true;
 }
 
@@ -71,22 +71,22 @@ void DBusListener::stop() {
     running = false;
 }
 
-void DBusListener::onFocusChanged(const QString& actionName) {
+void DBusListener::onFocusChanged(const QString& actionName) const {
     if (actionName.isEmpty()) {
         return;
     }
 
-    std::cout << "Focus changed to action: " << actionName.toStdString() << std::endl;
+    std::cout << "Focus changed to action: " << actionName.toStdString() << '\n';
     actionManager->executeStartActions(actionName.toStdString());
 }
 
-void DBusListener::ExecuteAction(const QString& actionName, bool isStart) {
+void DBusListener::ExecuteAction(const QString& actionName, bool isStart) const {
     if (actionName.isEmpty()) {
         return;
     }
 
     std::cout << "ExecuteAction method called: " << actionName.toStdString()
-              << " (isStart=" << (isStart ? "true" : "false") << ")" << std::endl;
+              << " (isStart=" << (isStart ? "true" : "false") << ")" << '\n';
 
     if (isStart) {
         actionManager->executeStartActions(actionName.toStdString());
@@ -95,12 +95,12 @@ void DBusListener::ExecuteAction(const QString& actionName, bool isStart) {
     }
 }
 
-void DBusListener::ExecuteActionInt(const QString& actionName, int isStart) {
+void DBusListener::ExecuteActionInt(const QString& actionName, int isStart) const {
     ExecuteAction(actionName, isStart != 0);
 }
 
-bool DBusListener::ReloadConfig() {
-    std::cout << "ReloadConfig method called" << std::endl;
+bool DBusListener::ReloadConfig() const {
+    std::cout << "ReloadConfig method called" << '\n';
     return actionManager->reloadActions();
 }
 
