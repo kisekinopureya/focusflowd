@@ -61,11 +61,14 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             clang-tidy \
             qt6-base-dev \
-            nlohmann-json3-dev
+            nlohmann-json3-dev \
+            cmake \
+            ninja-build
 
       - name: Configure 
         run: |
-          cmake -B build \
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DSYSTEMD=OFF
 

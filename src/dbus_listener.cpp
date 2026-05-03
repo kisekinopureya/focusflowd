@@ -71,7 +71,7 @@ void DBusListener::stop() {
     running = false;
 }
 
-void DBusListener::onFocusChanged(const QString& actionName) const {
+void DBusListener::onFocusChanged(const QString& actionName) {
     if (actionName.isEmpty()) {
         return;
     }
@@ -95,11 +95,11 @@ void DBusListener::ExecuteAction(const QString& actionName, bool isStart) const 
     }
 }
 
-void DBusListener::ExecuteActionInt(const QString& actionName, int isStart) const {
-    ExecuteAction(actionName, isStart != 0);
+void DBusListener::ExecuteActionInt(const QString& actionName, int startFlag) const {
+    ExecuteAction(actionName, startFlag != 0);
 }
 
-bool DBusListener::ReloadConfig() const {
+bool DBusListener::ReloadConfig() {
     std::cout << "ReloadConfig method called" << '\n';
     return actionManager->reloadActions();
 }

@@ -18,23 +18,27 @@ public:
     bool start();
     void stop();
 
+// NOLINTBEGIN(readability-redundant-access-specifiers)
+public slots:
     void ExecuteAction(const QString& actionName, bool isStart) const;
-    void ExecuteActionInt(const QString& actionName, int isStart) const;
-    [[nodiscard]] bool ReloadConfig() const;
+    void ExecuteActionInt(const QString& actionName, int startFlag) const;
+    bool ReloadConfig();
     void UpdateActiveWindow(const QString& windowClass, const QString& windowTitle, const QString& windowId);
-    [[nodiscard]] QString GetActiveWindowClass() const;
-    [[nodiscard]] QString GetActiveWindowTitle() const;
-    [[nodiscard]] QString GetActiveWindowId() const;
+    QString GetActiveWindowClass() const;
+    QString GetActiveWindowTitle() const;
+    QString GetActiveWindowId() const;
 
 signals:
-    void ActiveWindowChanged(const QString& windowClass, const QString& windowTitle, const QString& windowId);
+        void ActiveWindowChanged(const QString& windowClass, const QString& windowTitle, const QString& windowId);
+
+private slots:
+    void onFocusChanged(const QString& actionName);
 
 private:
-    void onFocusChanged(const QString& actionName) const;
-
     std::shared_ptr<ActionManager> actionManager;
     bool running;
     QString activeWindowClass;
     QString activeWindowTitle;
     QString activeWindowId;
 };
+// NOLINTEND(readability-redundant-access-specifiers)
