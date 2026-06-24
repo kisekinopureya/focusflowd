@@ -1,10 +1,11 @@
 #pragma once
 
-#include "action_manager.h"
-#include <memory>
-#include <string>
 #include <QObject>
 #include <QString>
+#include <memory>
+#include <string>
+#include "qtmetamacros.h"
+class ActionManager;
 
 class DBusListener final : public QObject {
     Q_OBJECT
@@ -21,7 +22,6 @@ public:
 // NOLINTBEGIN(readability-redundant-access-specifiers)
 public slots:
     void ExecuteAction(const QString& actionName, bool isStart) const;
-    void ExecuteActionInt(const QString& actionName, int startFlag) const;
     bool ReloadConfig();
     void UpdateActiveWindow(const QString& windowClass, const QString& windowTitle, const QString& windowId);
     QString GetActiveWindowClass() const;
@@ -29,7 +29,7 @@ public slots:
     QString GetActiveWindowId() const;
 
 signals:
-        void ActiveWindowChanged(const QString& windowClass, const QString& windowTitle, const QString& windowId);
+    void ActiveWindowChanged(const QString& windowClass, const QString& windowTitle, const QString& windowId);
 
 private slots:
     void onFocusChanged(const QString& actionName);

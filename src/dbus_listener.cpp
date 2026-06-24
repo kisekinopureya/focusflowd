@@ -1,8 +1,12 @@
 #include "dbus_listener.h"
-#include <iostream>
 #include <QDBusConnection>
 #include <QDBusError>
+#include <iostream>
 #include <utility>
+#include "action_manager.h"
+#include "qobjectdefs.h"
+#include "qstring.h"
+
 
 DBusListener::DBusListener(std::shared_ptr<ActionManager> actionManager)
     : actionManager(std::move(actionManager)), running(false) {}
@@ -93,10 +97,6 @@ void DBusListener::ExecuteAction(const QString& actionName, bool isStart) const 
     } else {
         actionManager->executeEndActions(actionName.toStdString());
     }
-}
-
-void DBusListener::ExecuteActionInt(const QString& actionName, int startFlag) const {
-    ExecuteAction(actionName, startFlag != 0);
 }
 
 bool DBusListener::ReloadConfig() {

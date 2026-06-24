@@ -1,9 +1,11 @@
 #pragma once
 
+#include <map>
+#include <nlohmann/detail/json_ref.hpp>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <vector>
-#include <map>
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

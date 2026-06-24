@@ -1,4 +1,5 @@
 Checks: >
+  -*,
   bugprone-*,
   performance-*,
   readability-*,

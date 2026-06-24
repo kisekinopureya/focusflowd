@@ -1,9 +1,11 @@
-#include "dbus_listener.h"
-#include "action_manager.h"
-#include <iostream>
-#include <memory>
 #include <QCoreApplication>
 #include <QDir>
+#include <iostream>
+#include <memory>
+#include <string>
+#include "action_manager.h"
+#include "dbus_listener.h"
+#include "qstring.h"
 
 const std::string version = "v0.1.0";
 
