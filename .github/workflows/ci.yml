@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches: ['**']
-    tags: ['v*']
+    branches: ["master"]
+    tags: ["v*"]
   pull_request:
 
 jobs:
@@ -43,6 +43,24 @@ jobs:
         with:
           name: focusflowd-binary
           path: focusflowd-linux-x86_64
+  clang-tidy:
+    name: Clang-Tidy Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ZedThree/clang-tidy-review@v0.23.1
+        with:
+          apt_packages: qt6-base-dev,nlohmann-json3-dev
+          build_dir: build
+          config_file: .clang-tidy
+          cmake_command: cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DSYSTEMD=OFF
 
   release:
     name: Release

@@ -1,26 +1,27 @@
 #pragma once
 
-#include "action_manager.h"
-#include <memory>
-#include <string>
 #include <QObject>
 #include <QString>
+#include <memory>
+#include <string>
+#include "qtmetamacros.h"
+class ActionManager;
 
-class DBusListener : public QObject {
+class DBusListener final : public QObject {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.kisekinopureya.FocusFlow")
 
 public:
-    DBusListener(std::shared_ptr<ActionManager> actionManager);
-    ~DBusListener();
+    explicit DBusListener(std::shared_ptr<ActionManager> actionManager);
+    ~DBusListener() override;
 
-    bool initialize(const std::string& configPath);
+    [[nodiscard]] bool initialize(const std::string& configPath) const;
     bool start();
     void stop();
 
+// NOLINTBEGIN(readability-redundant-access-specifiers)
 public slots:
-    void ExecuteAction(const QString& actionName, bool isStart);
-    void ExecuteActionInt(const QString& actionName, int isStart);
+    void ExecuteAction(const QString& actionName, bool isStart) const;
     bool ReloadConfig();
     void UpdateActiveWindow(const QString& windowClass, const QString& windowTitle, const QString& windowId);
     QString GetActiveWindowClass() const;
@@ -40,3 +41,4 @@ private:
     QString activeWindowTitle;
     QString activeWindowId;
 };
+// NOLINTEND(readability-redundant-access-specifiers)

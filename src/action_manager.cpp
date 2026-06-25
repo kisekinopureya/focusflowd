@@ -1,9 +1,10 @@
 #include "action_manager.h"
-#include <fstream>
-#include <sstream>
 #include <cstdlib>
-#include <iostream>
+#include <exception>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <utility>
 
 namespace fs = std::filesystem;
 
@@ -15,11 +16,11 @@ bool ActionManager::ensureConfigDirectory(const std::string& configPath) {
         fs::path dir = path.parent_path();
         if (!dir.empty() && !fs::exists(dir)) {
             fs::create_directories(dir);
-            std::cout << "Created config directory: " << dir << std::endl;
+            std::cout << "Created config directory: " << dir << '\n';
         }
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Failed to create config directory: " << e.what() << std::endl;
+        std::cerr << "Failed to create config directory: " << e.what() << '\n';
         return false;
     }
 }
@@ -32,15 +33,15 @@ bool ActionManager::createDefaultConfig(const std::string& configPath) {
 
         std::ofstream file(configPath);
         if (!file.is_open()) {
-            std::cerr << "Failed to create default config: " << configPath << std::endl;
+            std::cerr << "Failed to create default config: " << configPath << '\n';
             return false;
         }
 
-        file << data.dump(2) << std::endl;
-        std::cout << "Created default config file: " << configPath << std::endl;
+        file << data.dump(2) << '\n';
+        std::cout << "Created default config file: " << configPath << '\n';
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Error creating default config: " << e.what() << std::endl;
+        std::cerr << "Error creating default config: " << e.what() << '\n';
         return false;
     }
 }
@@ -55,9 +56,9 @@ bool ActionManager::loadActions(const std::string& configPath) {
 
     // If file doesn't exist, create a default one
     if (!file.is_open()) {
-        std::cout << "Config file not found: " << configPath << std::endl;
+        std::cout << "Config file not found: " << configPath << '\n';
         if (createDefaultConfig(configPath)) {
-            std::cout << "Created default config, service will run with no actions" << std::endl;
+            std::cout << "Created default config, service will run with no actions" << '\n';
             actions.clear();
             return true;
         }
@@ -73,20 +74,20 @@ bool ActionManager::loadActions(const std::string& configPath) {
             Action action = Action::from_json(actionJson);
             actions[action.name] = action;
         }
-        std::cout << "Loaded " << actions.size() << " action(s) from config" << std::endl;
+        std::cout << "Loaded " << actions.size() << " action(s) from config" << '\n';
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Error parsing config file: " << e.what() << std::endl;
+        std::cerr << "Error parsing config file: " << e.what() << '\n';
         return false;
     }
 }
 
 bool ActionManager::reloadActions() {
     if (configPath.empty()) {
-        std::cerr << "Config path not set, cannot reload" << std::endl;
+        std::cerr << "Config path not set, cannot reload" << '\n';
         return false;
     }
-    std::cout << "Reloading configuration..." << std::endl;
+    std::cout << "Reloading configuration..." << '\n';
     return loadActions(configPath);
 }
 
@@ -97,39 +98,40 @@ bool ActionManager::saveActions(const std::string& configPath) const {
     std::ofstream file(configPath);
 
     if (!file.is_open()) {
-        std::cerr << "Failed to open config file for writing: " << configPath << std::endl;
+        std::cerr << "Failed to open config file for writing: " << configPath << '\n';
         return false;
     }
 
     try {
         json data;
         std::vector<json> actionList;
+        actionList.reserve(actions.size());
         for (const auto& [name, action] : actions) {
             actionList.push_back(action.to_json());
         }
         data["actions"] = actionList;
 
-        file << data.dump(2) << std::endl;
-        std::cout << "Saved " << actions.size() << " action(s) to config" << std::endl;
+        file << data.dump(2) << '\n';
+        std::cout << "Saved " << actions.size() << " action(s) to config" << '\n';
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Error writing config file: " << e.what() << std::endl;
+        std::cerr << "Error writing config file: " << e.what() << '\n';
         return false;
     }
 }
 
 const Action* ActionManager::getAction(const std::string& actionName) const {
-    auto it = actions.find(actionName);
-    if (it != actions.end()) {
-        return &it->second;
+    auto action = actions.find(actionName);
+    if (action != actions.end()) {
+        return &action->second;
     }
     return nullptr;
 }
 
-void ActionManager::executeStartActions(const std::string& actionName) {
+void ActionManager::executeStartActions(const std::string& actionName) const {
     const Action* action = getAction(actionName);
-    if (!action) {
-        std::cerr << "Action not found: " << actionName << std::endl;
+    if (action == nullptr) {
+        std::cerr << "Action not found: " << actionName << '\n';
         return;
     }
 
@@ -138,10 +140,10 @@ void ActionManager::executeStartActions(const std::string& actionName) {
     }
 }
 
-void ActionManager::executeEndActions(const std::string& actionName) {
+void ActionManager::executeEndActions(const std::string& actionName) const {
     const Action* action = getAction(actionName);
-    if (!action) {
-        std::cerr << "Action not found: " << actionName << std::endl;
+    if (action == nullptr) {
+        std::cerr << "Action not found: " << actionName << '\n';
         return;
     }
 
@@ -155,9 +157,8 @@ void ActionManager::executeAction(const std::string& command) {
         return;
     }
 
-    std::cout << "Executing: " << command << std::endl;
-    int result = system(command.c_str());
-    if (result != 0) {
-        std::cerr << "Command failed with exit code: " << result << std::endl;
+    std::cout << "Executing: " << command << '\n';
+    if (int result = system(command.c_str()); result != 0) {
+        std::cerr << "Command failed with exit code: " << result << '\n';
     }
 }
