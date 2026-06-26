@@ -1,4 +1,5 @@
 #include "action_manager.h"
+#include <QProcess>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
@@ -71,8 +72,7 @@ bool ActionManager::loadActions(const std::string& configPath) {
 
         actions.clear();
         for (const auto& actionJson : data.at("actions")) {
-            Action action = Action::from_json(actionJson);
-            actions[action.name] = action;
+            actions.push_back(Action::from_json(actionJson));
         }
         std::cout << "Loaded " << actions.size() << " action(s) from config" << '\n';
         return true;
@@ -106,7 +106,7 @@ bool ActionManager::saveActions(const std::string& configPath) const {
         json data;
         std::vector<json> actionList;
         actionList.reserve(actions.size());
-        for (const auto& [name, action] : actions) {
+        for (const auto& action : actions) {
             actionList.push_back(action.to_json());
         }
         data["actions"] = actionList;
@@ -121,11 +121,28 @@ bool ActionManager::saveActions(const std::string& configPath) const {
 }
 
 const Action* ActionManager::getAction(const std::string& actionName) const {
-    auto action = actions.find(actionName);
-    if (action != actions.end()) {
-        return &action->second;
+    for (const auto& action : actions) {
+        if (action.name == actionName) {
+            return &action;
+        }
     }
     return nullptr;
+}
+
+void ActionManager::addAction(const Action& action) {
+    actions.push_back(action);
+}
+
+void ActionManager::removeAction(size_t index) {
+    if (index < actions.size()) {
+        actions.erase(actions.begin() + static_cast<std::vector<Action>::difference_type>(index));
+    }
+}
+
+void ActionManager::updateAction(size_t index, const Action& action) {
+    if (index < actions.size()) {
+        actions[index] = action;
+    }
 }
 
 void ActionManager::executeStartActions(const std::string& actionName) const {
@@ -158,7 +175,8 @@ void ActionManager::executeAction(const std::string& command) {
     }
 
     std::cout << "Executing: " << command << '\n';
-    if (int result = system(command.c_str()); result != 0) {
+    const int result = QProcess::execute("/bin/sh", {"-lc", QString::fromStdString(command)});
+    if (result != 0) {
         std::cerr << "Command failed with exit code: " << result << '\n';
     }
 }

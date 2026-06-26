@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=FocusFlow
+Comment=Run FocusFlow and configure focus-based actions
+Exec=focusflowd
+Icon=focusflowd
+Terminal=false
+Categories=Utility;Settings;
+Keywords=focusflow;actions;configuration;tray;

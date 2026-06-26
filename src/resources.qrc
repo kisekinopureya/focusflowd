@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="focusflow.svg">../icons/hicolor/scalable/apps/focusflowd.svg</file>
+    </qresource>
+</RCC>

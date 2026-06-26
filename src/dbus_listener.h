@@ -15,7 +15,7 @@ public:
     explicit DBusListener(std::shared_ptr<ActionManager> actionManager);
     ~DBusListener() override;
 
-    [[nodiscard]] bool initialize(const std::string& configPath) const;
+    [[nodiscard]] bool initialize(const std::string& configPath);
     bool start();
     void stop();
 

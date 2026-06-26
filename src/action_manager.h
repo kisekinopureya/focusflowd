@@ -1,9 +1,6 @@
 #pragma once
 
-#include <map>
-#include <nlohmann/detail/json_ref.hpp>
 #include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <vector>
 
@@ -55,14 +52,27 @@ public:
     [[nodiscard]] const Action* getAction(const std::string& actionName) const;
 
     // Get all actions
-    [[nodiscard]] const std::map<std::string, Action>& getAllActions() const { return actions; }
+    [[nodiscard]] const std::vector<Action>& getActions() const { return actions; }
+    std::vector<Action>& getActions() { return actions; }
+
+    // Add a new action
+    void addAction(const Action& action);
+
+    // Remove action by index
+    void removeAction(size_t index);
+
+    // Update action at index
+    void updateAction(size_t index, const Action& action);
+
+    // Get config file path
+    [[nodiscard]] const std::string& getConfigPath() const { return configPath; }
 
     // Execute actions (start or end)
     void executeStartActions(const std::string& actionName) const;
     void executeEndActions(const std::string& actionName) const;
 
 private:
-    std::map<std::string, Action> actions;
+    std::vector<Action> actions;
     std::string configPath;
 
     static void executeAction(const std::string& command);

@@ -15,7 +15,7 @@ DBusListener::~DBusListener() {
     stop();
 }
 
-bool DBusListener::initialize(const std::string& configPath) const {
+bool DBusListener::initialize(const std::string& configPath) {
     if (QDBusConnection bus = QDBusConnection::sessionBus(); !bus.isConnected()) {
         std::cerr << "Failed to connect to session D-Bus" << '\n';
         return false;

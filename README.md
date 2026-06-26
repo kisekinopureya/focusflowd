@@ -1,12 +1,13 @@
-# FocusFlow Daemon
+# FocusFlow
 
-A D-Bus listener service for managing system actions based on application focus changes.
+A Qt desktop application that starts the FocusFlow D-Bus listener on launch, lets users edit action rules, and stays available in the system tray.
 
 ## Features
 
 - D-Bus based IPC for focus change events
+- Built-in action editor for start and end commands
 - JSON configuration for action definitions
-- String-based action execution
+- Tray icon support so the app can keep running when hidden
 - Support for start and end actions per application focus
 
 ## Building
@@ -14,8 +15,8 @@ A D-Bus listener service for managing system actions based on application focus 
 ### Prerequisites
 
 - C++17 compiler
-- Qt development files
-- Qt DBus development files
+- Qt6 development files
+- Qt6 DBus and Widgets development files
 - nlohmann_json
 
 ### Build Instructions
@@ -23,7 +24,7 @@ A D-Bus listener service for managing system actions based on application focus 
 ```sh
 mkdir build
 cd build
-cmake (-DSYSTEMD=true or -DOPENRC=true) ..
+cmake ..
 make
 sudo make install
 ```
@@ -32,24 +33,10 @@ sudo make install
 
 Actions are stored in `~/.config/focusflow/actions.json` see `example-actions.json`
 
-### Starting the Service
+## Running FocusFlow
 
 ```sh
 $ focusflowd
 ```
 
-with systemd:
-
-```sh
-$ systemctl --user enable --now focusflowd
-```
-
-with openrc:
-
-```sh
-$ rc-update --user add focusflowd; rc-service --user focusflowd start
-```
-
-## Configuration Tool
-
-Use [focusflow-config](https://github.com/kisekinopureya/focusflow-config) to manage actions visually instead of editing JSON manually.
+Launching the application starts the embedded daemon automatically. Closing or minimizing the window hides it to the system tray, and the tray menu can restore or quit the app.
